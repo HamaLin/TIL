@@ -130,9 +130,9 @@ let myVocaloid = createVocaloid({ name: 'Rin', genderType: 'F' });
 
 3.  새로운 변수 선언
     (이 방법은 TS컴파일러를 회피하는 방식인거 같습니다, 다만 일치하는 프로퍼티가 한개라도 있어야 가능한 방법입니다.)
-        ```tsx
-        let newObj = {name: '', genderType: 'F'}
-        let myVocaloid = createVocaloid(newObj);
+    ```tsx
+    let newObj = {name: '', genderType: 'F'}
+    let myVocaloid = createVocaloid(newObj);
 
         let newObj = {genderType: 'F'}
         let myVocaloid = createVocaloid(newObj); // Error
@@ -157,3 +157,54 @@ mySearch = function (source, subString) {
   return result > -1;
 };
 ```
+
+<br>
+<br>
+<br>
+
+# 인덱시블 타입
+
+인덱시블 타입이라는 건 배열에서 `arr[1]` 이나 `obj['id']` 와 같이 값을 가져오는 것처럼, '인덱싱'으로 타입을 정의하는 것을 말합니다.
+
+다음과 같은 예제를 보시죠
+
+```ts
+interface ArrInterface {
+  [index: number]: string;
+}
+
+let arr: ArrInterface = ["bob", "jin"];
+```
+
+다음과 같이 타입을 정의할 수 있습니다. 다만 인덱싱 타입은 `string`과 `number`만 가능하다는 점만 기억하면 될 거 같습니다.
+
+그리고 인덱시블은 인터페이스안에 1가지만 정의할 수 있는 것으로 보입니다(추측) 해당 인터페이스의 규칙을 정립하는 방식이라 2가지가 공존하기 어렵다고 생각이 듭니다. 다음과 같이 보시죠
+
+```ts
+interface NumberDictionary {
+  [index: string]: number;
+  [index: number]: string; // X 두 가지의 인덱시블은 에러를 유발합니다.
+  length: number; // 성공, length는 숫자입니다
+  name: string; // 오류, `name`의 타입은 인덱서의 하위타입이 아닙니다
+}
+
+// 위의 오류를 고치고 싶다면 다음과 같이 하시면 됩니다.
+interface NumberDictionary {
+  [index: string]: number | string;
+  length: number; // 성공, length는 숫자입니다
+  name: string; // 성공, name은 string입니다.
+}
+
+// 인덱시블도 readonly타입을 선언 할 수 있습니다.
+interface ReadonlyStringArray {
+  readonly [index: number]: string;
+}
+let myArray: ReadonlyStringArray = ["Alice", "Bob"];
+myArray[2] = "Mallory"; // 오류!
+```
+
+<br>
+<br>
+<br>
+
+# 클래스 타입
